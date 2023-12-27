@@ -1,14 +1,12 @@
 import Image from "next/image"
 import Node from "@/components/Node"
-
+import Link from "next/link"
+import Nav from "@/components/Nav"
 export default function Home() {
   return (
-    <main className="flex min-h-screen flex-col items-center  p-16   border-black">
-      <h3 className="text-4xl  font-semibold">Validator Monitoring</h3>
-
-      <div className="flex flex-col justify-center items-center  font-semibold   ">
-        <Node />
-      </div>
-    </main>
+    <>
+      {" "}
+      <h1 className="text-3xl flex justify-center items-center">Home</h1>
+    </>
   )
 }
