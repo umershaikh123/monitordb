@@ -7,6 +7,14 @@ export default function Home() {
       <h3 className="text-4xl  font-semibold">Validator Monitoring</h3>
 
       <div className="flex flex-col justify-center items-center  font-semibold   ">
+        <h1>validator_index = 645904</h1>
+        <h1>state_id = head</h1>
+        <h1>/eth/v1/beacon/states/state_id/validators/validator_index</h1>
+
+        <p className=" text-gray-500">
+          Returns validator specified by state and id or public key along with
+          status and balance.
+        </p>
         <Node />
       </div>
     </main>

@@ -17,6 +17,13 @@ export default function Nav() {
           <Link href={"/block"} className=" hover:scale-110 transition-all">
             <li>Block data</li>
           </Link>
+
+          <Link
+            href={"/withdrawls"}
+            className=" hover:scale-110 transition-all"
+          >
+            <li>Withdrawls data</li>
+          </Link>
         </ul>
       </div>
     </div>
