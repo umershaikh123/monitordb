@@ -1,10 +1,13 @@
+"use client"
+
 import { validateHeaderName } from "http"
 import next from "next"
 import React from "react"
+import { useState, useEffect, useRef } from "react"
 
 import style from "./Table.module.css"
 import { useRouter } from "next/navigation"
-
+// import * as React from "react"
 interface ApiDataDisplayProps {
   api?: string // Optional title for the table
 }
@@ -20,116 +23,230 @@ async function fetchApiData(
     next: { revalidate: 5 },
   })
 
-  const data = (await res.json()) as ApiDataDisplayProps
+  const data = await res.json()
   return data
 }
 
-// const ApiComponent: React.FC<ApiDataDisplayProps> = async({api = "eth/v1/beacon/genesis" }) => {
-//   const res = await fetch(`http://47.128.81.7:3500/${api}`, {
-//     method: "GET",
-//     headers: {
-//       "Content-Type": "application/json",
-//     },
-//     next: { revalidate: 5 },
-//   })
-
-//   const data = res.json()
-//   return data
-// }
-interface TableData {
-  headers: string[]
-  rows: { [key: string]: any }[]
-}
-
-function TableComponent({ data }: { data: TableData }): any {
-  ;<>
-    <table className="w-full mt-4 mb-7 text-left">
-      <thead>
-        <tr>
-          {data.headers.map(header => (
-            <th key={header} className="text-left text-white px-4">
-              {header}
-            </th>
-          ))}
-        </tr>
-      </thead>
-      <tbody>
-        {data.rows.map(row => (
-          <tr key={row.id}>
-            {data.headers.map(header => (
-              <td key={header} className="px-4">
-                {row[header]}
-              </td>
-            ))}
-          </tr>
-        ))}
-      </tbody>
-    </table>
-  </>
-}
-
-function tableComponent4({ h1, d1, h2, d2, h3, d3, h4, d4 }: any) {
-  ;<table className="w-full mt-4 mb-7 text-left">
-    <tr>
-      <th className="text-left text-white px-4">Metric</th>
-      <th className="text-white px-4">Value</th>
-    </tr>
-    <tr>
-      <td className="text-left px-4">{h1}</td>
-      <td className="px-4">{d1}</td>
-    </tr>
-    <tr>
-      <td className="text-left px-4">{h2}</td>
-      <td className="px-4">{d2}</td>
-    </tr>
-
-    <tr>
-      <td className="text-left px-4">{h3}</td>
-      <td className="px-4">{d3}</td>
-    </tr>
-  </table>
-}
-export default async function Node() {
+export default function Node() {
   // const router = useRouter()
 
-  const apiList = ["/eth/v1/beacon/genesis", ""]
-  const results = await fetchApiData(apiList[0])
-  console.log(results?.data)
-  // router.refresh()
+  const state_id = "head"
+  const validator_index = "645904"
+  const block_id = "head"
+  const apiList = [
+    `/eth/v1/beacon/states/${state_id}/validators/${validator_index}`,
+    `/eth/v1/beacon/states/${state_id}/validator_balances/${validator_index}`,
+    `/eth/v1/beacon/blocks/${block_id}`,
+    `/eth/v1/beacon/states/${state_id}/validator_exits`,
+  ]
+  const [data, setData] = useState<any>(null)
+  const [error, setError] = useState<string | null>(null)
+  const result1: any = fetchApiData(apiList[0])
+  const result2: any = fetchApiData(apiList[1])
+  const result3: any = fetchApiData(apiList[2])
+  const result4: any = fetchApiData(apiList[3])
 
-  // const tableData: TableData = {
-  //   headers: ["Metric", "Value"],
-  //   rows: [
-  //     { id: 1, h1: "Genesis Time", d1: results.data?.genesis_time },
-  //     { id: 2, h2: "Genesis Validators Root", d2: "0x..." },
-  //     { id: 3, h3: "Genesis Fork Version", d3: "0" },
-  //   ],
+  console.log("R1 ", result1?.data)
+  console.log("R2 ", result2?.data)
+  console.log("R3 ", result3?.data)
+  console.log("R4 ", result4?.data)
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const fetchedData = await fetchApiData(apiList[0])
+        console.log("fetchedData", fetchedData)
+
+        setData(fetchedData)
+      } catch (error: any) {
+        setError(error.message)
+      }
+    }
+
+    fetchData() // Initial fetch
+
+    // Set up interval for subsequent fetches
+    const intervalId = setInterval(fetchData, 5000)
+    console.log("data", data)
+    // Cleanup function to clear the interval
+    return () => clearInterval(intervalId)
+  }, [apiList[0]])
+  // let index, balance, status
+  // if (data) {
+  //   const {
+  //     data: { index, balance, status },
+  //   } = data
   // }
 
   return (
     <>
-      <div className="flex mt-5">
-        <h1 className="text-2xl">Api : {apiList[0]}</h1>
-      </div>{" "}
-      <table className="w-full mt-4 mb-7 text-left">
-        <tr>
-          <th className="text-left text-white px-4">Metric</th>
-          <th className="text-white px-4">Value</th>
-        </tr>
-        <tr>
-          <td className="text-left px-4"> Genesis Time</td>
-          <td className="px-4">{results.data.genesis_time}</td>
-        </tr>
-        <tr>
-          <td className="text-left px-4">genesis_validators_root</td>
-          <td className="px-4">{results.data.genesis_validators_root} </td>
-        </tr>
+      {error ? (
+        <p>Error fetching data: {error}</p>
+      ) : data ? (
+        <div className="flex mt-5 space-x-8  ">
+          {/* <pre>{JSON.stringify(data, null, 2)}</pre> */}
 
-        <tr>
-          <td className="text-left px-4">genesis_fork_version</td>
-          <td className="px-4">{results.data.genesis_fork_version}</td>
-        </tr>
-      </table>{" "}
+          <div>
+            <table className="w-full mt-4 mb-7 text-left">
+              <tr>
+                <th className="text-left text-white px-4">Metric</th>
+                <th className="text-white px-4">Value</th>
+              </tr>
+              <tr>
+                <td className="text-left px-4">index</td>
+                <td className="px-4">{data.data.index}</td>
+              </tr>
+              <tr>
+                <td className="text-left px-4">balance</td>
+                <td className="px-4">{data.data.balance} </td>
+              </tr>
+              <tr>
+                <td className="text-left px-4">status</td>
+                <td className="px-4">{data.data.status}</td>
+              </tr>
+              <tr>
+                <td className="text-left px-4">finalized</td>
+
+                {data.data.finalized ? (
+                  <td className="px-4">True</td>
+                ) : (
+                  <>
+                    <td className="px-4">False</td>
+                  </>
+                )}
+              </tr>
+              <tr>
+                <td className="text-left px-4">pubkey</td>
+                <td className="px-4">{data.data.validator.pubkey}</td>
+              </tr>
+              <tr>
+                <td className="text-left px-4"> execution_optimistic</td>
+
+                {data.execution_optimistic ? (
+                  <td className="px-4">True</td>
+                ) : (
+                  <>
+                    <td className="px-4">False</td>
+                  </>
+                )}
+              </tr>
+              <tr>
+                <td className="text-left px-4">withdrawal_credentials</td>
+                <td className="px-4">
+                  {data.data.validator.withdrawal_credentials}
+                </td>
+              </tr>{" "}
+              <tr>
+                <td className="text-left px-4">effective_balance</td>
+                <td className="px-4">
+                  {data.data.validator.effective_balance}
+                </td>
+              </tr>{" "}
+              <tr>
+                <td className="text-left px-4  ">slashed</td>
+
+                {data.data.slashed ? (
+                  <td className="px-4">True</td>
+                ) : (
+                  <>
+                    <td className="px-4">False</td>
+                  </>
+                )}
+              </tr>{" "}
+              <tr>
+                <td className="text-left px-4">
+                  {" "}
+                  activation_eligibility_epoch
+                </td>
+                <td className="px-4">
+                  {data.data.validator.activation_eligibility_epoch}
+                </td>
+              </tr>
+              <tr>
+                <td className="text-left px-4">activation_epoch</td>
+                <td className="px-4">{data.data.validator.activation_epoch}</td>
+              </tr>
+              <tr>
+                <td className="text-left px-4">exit_epoch</td>
+                <td className="px-4">{data.data.validator.exit_epoch}</td>
+              </tr>{" "}
+              <tr>
+                <td className="text-left px-4">withdrawable_epoch</td>
+                <td className="px-4">
+                  {data.data.validator.withdrawable_epoch}
+                </td>
+              </tr>
+              {/* <tr>
+                <td className="text-left px-4"></td>
+                <td className="px-4">{data.data.}</td>
+              </tr>              <tr>
+                <td className="text-left px-4"></td>
+                <td className="px-4">{data.data.}</td>
+              </tr> */}
+            </table>
+          </div>
+          {/* 
+          <div>
+            <table className="w-full mt-4 mb-7 text-left">
+              <tr>
+                <th className="text-left text-white px-4">
+                  execution_optimistic
+                </th>
+                <th className="text-left text-white px-4">finalized</th>
+                <th className="text-left text-white px-4">pubkey</th>
+                <th className="text-white px-4">withdrawal_credentials</th>
+                <th className="text-white px-4">effective_balance</th>
+
+                <th className="text-white px-4">slashed</th>
+                <th className="text-white px-4">
+                  activation_eligibility_epoch
+                </th>
+                <th className="text-white px-4">activation_epoch</th>
+                <th className="text-white px-4">exit_epoch</th>
+
+                <th className="text-white px-4">withdrawable_epoch</th>
+              </tr>
+              {/* <tr>
+              <td className="text-left px-4">index</td>
+              <td className="px-4">{data.data.index}</td>
+            </tr>
+            <tr>
+              <td className="text-left px-4">balance</td>
+              <td className="px-4">{data.data.balance} </td>
+            </tr>
+
+            <tr>
+              <td className="text-left px-4">status</td>
+              <td className="px-4">{data.data.status}</td>
+            </tr> 
+            </table>
+          </div> */}
+        </div>
+      ) : (
+        <p>Loading data...</p>
+      )}
+
+      {/* <div className="flex mt-5">
+        <table className="w-full mt-4 mb-7 text-left">
+          <tr>
+            <th className="text-left text-white px-4">Metric</th>
+            <th className="text-white px-4">Value</th>
+          </tr>
+          <tr>
+            <td className="text-left px-4">index</td>
+            <td className="px-4">{result1.index}</td>
+          </tr>
+          <tr>
+            <td className="text-left px-4">balance</td>
+            <td className="px-4">{result1.balance} </td>
+          </tr>
+
+          <tr>
+            <td className="text-left px-4">status</td>
+            <td className="px-4">{result1.data.status}</td>
+          </tr>
+        </table>
+      </div> */}
     </>
   )
 }
