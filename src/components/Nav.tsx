@@ -13,6 +13,12 @@ export default function Nav() {
           <Link href={"/validator"} className=" hover:scale-110 transition-all">
             <li>Validator data</li>
           </Link>
+          <Link
+            href={"/Allvalidator"}
+            className=" hover:scale-110 transition-all"
+          >
+            <li>All Validators</li>
+          </Link>
 
           <Link href={"/block"} className=" hover:scale-110 transition-all">
             <li>Block data</li>

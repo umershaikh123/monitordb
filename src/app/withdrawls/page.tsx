@@ -19,7 +19,7 @@ export default function Home() {
           Get the withdrawals computed from the specified state, that will be
           included in the block that gets built on the specified state.
         </p>
-        <WithdrawNode />
+        {/* <WithdrawNode /> */}
       </div>
     </main>
   )

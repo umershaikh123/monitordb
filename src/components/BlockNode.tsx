@@ -20,7 +20,7 @@ async function fetchApiData(
     headers: {
       "Content-Type": "application/json",
     },
-    next: { revalidate: 5 },
+    next: { revalidate: 10 },
   })
 
   const data = await res.json()
@@ -71,7 +71,7 @@ export default function BlockNode() {
     fetchData() // Initial fetch
 
     // Set up interval for subsequent fetches
-    const intervalId = setInterval(fetchData, 1000)
+    const intervalId = setInterval(fetchData, 5000)
     console.log("data", data)
     // Cleanup function to clear the interval
     return () => clearInterval(intervalId)

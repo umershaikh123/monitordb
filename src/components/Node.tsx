@@ -20,7 +20,7 @@ async function fetchApiData(
     headers: {
       "Content-Type": "application/json",
     },
-    next: { revalidate: 5 },
+    next: { revalidate: 10 },
   })
 
   const data = await res.json()
