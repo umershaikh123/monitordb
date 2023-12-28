@@ -8,13 +8,16 @@ interface ApiDataDisplayProps {
 export async function fetchApiData(
     api = "eth/v1/beacon/genesis"
   ): Promise<ApiDataDisplayProps> {
-    const res = await fetch(`http://47.128.81.7:3500/${api}`, {
+    const res = await fetch(`http://47.128.81.7:3500/${api}`,  {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
       },
-      next: { revalidate: 10 },
-    })
+
+    //   next: { revalidate: 10 },
+    // {  cache: 'no-store'}
+   
+    },  )
   
     const data = await res.json()
     return data

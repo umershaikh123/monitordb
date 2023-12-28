@@ -27,9 +27,7 @@ interface ApiDataDisplayProps {
   validator_index?: string // Optional title for the table
 }
 
-async function fetchApiData(
-  validator_index = "645904"
-): Promise<ApiDataDisplayProps> {
+async function fetchApiData(validator_index = "645904") {
   const res = await fetch(
     `http://47.128.81.7:3500/eth/v1/beacon/states/head/validators/${validator_index}`,
     {
@@ -37,7 +35,8 @@ async function fetchApiData(
       headers: {
         "Content-Type": "application/json",
       },
-      next: { revalidate: 10 },
+      cache: "no-store",
+      // next: { revalidate: 10 },
     }
   )
 
